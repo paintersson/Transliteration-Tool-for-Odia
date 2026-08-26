@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odia Transliteration Tool - Aatmik Geetmala</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        textarea { font-family: monospace; scrollbar-width: thin; }
+        textarea::-webkit-scrollbar { width: 6px; }
+        textarea::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 border-b border-slate-200 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">Odia Transliteration Tool</h1>
+                <p class="text-slate-600">Aatmik Geetmala - Advanced Odia Engine</p>
+            </div>
+            <div class="text-xs text-slate-400 bg-white px-3 py-1 rounded-full border border-slate-200 self-start shadow-sm">
+                v4.1.0 • Global Phonetics & Numbers
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Input Section -->
+            <div class="flex flex-col space-y-4">
+                <div class="flex flex-col space-y-1">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Extracted Odia Title</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="odiTitle" readonly class="flex-1 p-2 text-sm border border-slate-300 rounded-lg bg-slate-100 outline-none text-slate-600 font-medium" placeholder="Title will appear here...">
+                        <button onclick="copyTarget('odiTitle', this)" class="p-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-all shadow-sm active:scale-95 flex items-center justify-center w-10" title="Copy Odia Title">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col space-y-2">
+                    <label class="font-semibold text-slate-700 flex justify-between">
+                        <span>Odia Input</span>
+                        <span class="text-xs font-normal text-slate-500 italic">Paste Odia lyrics here</span>
+                    </label>
+                    <textarea id="input" class="w-full h-[50vh] p-4 border border-slate-300 rounded-xl shadow-inner focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all leading-relaxed" placeholder="Paste your Odia lyrics here..."></textarea>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <button onclick="processText()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex-1 md:flex-none">
+                        Transliterate All
+                    </button>
+                    <div id="status" class="text-sm font-medium text-blue-600 italic"></div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="flex flex-col space-y-4">
+                <div class="flex flex-col space-y-1">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Extracted English Title</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="engTitle" readonly class="flex-1 p-2 text-sm border border-slate-300 rounded-lg bg-blue-50 outline-none text-blue-800 font-medium" placeholder="Transliterated title...">
+                        <button onclick="copyTarget('engTitle', this)" class="p-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-all shadow-sm active:scale-95 flex items-center justify-center w-10" title="Copy English Title">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col space-y-2">
+                    <label class="font-semibold text-slate-700 flex justify-between">
+                        <span>English Output</span>
+                        <span class="text-xs font-normal text-slate-500 italic">Copy this to your app database</span>
+                    </label>
+                    <textarea id="output" readonly class="w-full h-[50vh] p-4 border border-slate-300 rounded-xl shadow-inner bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed" placeholder="Transliterated text will appear here..."></textarea>
+                </div>
+                
+                <button onclick="copyToClipboard()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg active:scale-95">
+                    Copy Complete Result
+                </button>
+            </div>
+        </div>
+
+        <section class="mt-12 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-800 mb-4">Active Global Rules (v4.1.0)</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <div class="text-xs text-slate-400 mb-1">Number Shift</div>
+                    <div class="font-bold text-slate-700">୧, ୨, ୩ → 1, 2, 3</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <div class="text-xs text-slate-400 mb-1">Global Vowels</div>
+                    <div class="font-bold text-slate-700">ଈ / ୀ → i</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <div class="text-xs text-slate-400 mb-1">Double 'A' Trimming</div>
+                    <div class="font-bold text-slate-700">ପ୍ରାର୍ଥନା → Prarthana</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <div class="text-xs text-slate-400 mb-1">Contextual Nasals</div>
+                    <div class="font-bold text-slate-700">ସଂପର୍କ → Samparka</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <div class="text-xs text-slate-400 mb-1">Schwa Deletion</div>
+                    <div class="font-bold text-slate-700">ଖ୍ରୀଷ୍ଟ → Khrist</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <div class="text-xs text-slate-400 mb-1">Proper Nouns</div>
+                    <div class="font-bold text-slate-700">ଈଶ୍ୱରଙ୍କ → Ishwarangka</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <div class="text-xs text-slate-400 mb-1">Palatals</div>
+                    <div class="font-bold text-slate-700">ଅଞ୍ଚଳ → Anchala</div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-8 text-slate-400 text-sm text-center">
+            <p>Built for the Aatmik Geetmala Project</p>
+        </footer>
+    </div>
+
+    <script>
+        const mapping = {
+            'ଅ': 'a', 'ଆ': 'aa', 'ଇ': 'i', 'ଈ': 'i', 'ଉ': 'u', 'ଊ': 'u', 'ଋ': 'ru', 'ଏ': 'e', 'ଐ': 'ai', 'ଓ': 'o', 'ଔ': 'au',
+            'କ': 'ka', 'ଖ': 'kha', 'ଗ': 'ga', 'ଘ': 'gha', 'ଙ': 'nga',
+            'ଚ': 'cha', 'ଛ': 'chha', 'ଜ': 'ja', 'ଝ': 'jha', 'ଞ': 'nya',
+            'ଟ': 'ta', 'ଠ': 'tha', 'ଡ': 'da', 'ଢ': 'dha', 'ଣ': 'na',
+            'ତ': 'ta', 'ଥ': 'tha', 'ଦ': 'da', 'ଧ': 'dha', 'ନ': 'na',
+            'ପ': 'pa', 'ଫ': 'pha', 'ବ': 'ba', 'ଭ': 'bha', 'ମ': 'ma',
+            'ଯ': 'ja', 'ୟ': 'ya', 'ର': 'ra', 'ଲ': 'la', 'ଳ': 'la', 'ୱ': 'wa',
+            'ଶ': 'sha', 'ଷ': 'sha', 'ସ': 'sa', 'ହ': 'ha',
+            'ଡ଼': 'ra', 'ଢ଼': 'rha',
+            'ା': 'aa', 'ି': 'i', 'ୀ': 'i', 'ୁ': 'u', 'ୂ': 'u', 'ୃ': 'ru', 'େ': 'e', 'ୈ': 'ai', 'ୋ': 'o', 'ୌ': 'au',
+            'ଂ': 'n', 'ଁ': 'n', 'ଃ': 'h'
+        };
+
+        const vowelSigns = ['ା', 'ି', 'ୀ', 'ୁ', 'ୂ', 'ୃ', 'େ', 'ୈ', 'ୋ', 'ୌ'];
+        const independentVowels = 'ଅଆଇଈଉଊଋଏଐଓଔ'; 
+
+        // Helper to instantly swap all Odia digits to Western digits
+        function convertOdiaNumbers(str) {
+            const numMap = {'୦':'0','୧':'1','୨':'2','୩':'3','୪':'4','୫':'5','୬':'6','୭':'7','୮':'8','୯':'9'};
+            return str.replace(/[୦-୯]/g, match => numMap[match]);
+        }
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return string;
+            return string.replace(/(^\s*|[.!?]\s+)([a-z])/g, function(match, separator, letter) {
+                return separator + letter.toUpperCase();
+            });
+        }
+
+        function transliterateOdia(text) {
+            text = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+            text = text.replace(/ଡ\u0B3C/g, 'ଡ଼').replace(/ଢ\u0B3C/g, 'ଢ଼');
+            text = text.normalize('NFC');
+            text = text.replace(/\u0B3C/g, '');
+            text = text.replace(/।/g, '.').replace(/॥/g, '..');
+
+            let result = "";
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                let nextChar = text[i + 1] || "";
+
+                if (char === '୍') continue; 
+
+                if (mapping[char]) {
+                    if (mapping[char].endsWith('a') && char.length >= 1 && !independentVowels.includes(char)) {
+                        if (vowelSigns.includes(nextChar)) {
+                            result += mapping[char].slice(0, -1) + mapping[nextChar];
+                            i++; 
+                        } else if (nextChar === '୍') {
+                            result += mapping[char].slice(0, -1);
+                            i++; 
+                        } else {
+                            result += mapping[char]; 
+                        }
+                    } else {
+                        result += mapping[char];
+                    }
+                } else {
+                    result += char; 
+                }
+            }
+            
+            return result
+                .replace(/n([p|b|m])/gi, 'm$1')
+                .replace(/ny([c|j])/gi, 'n$1')
+                .replace(/aa\b/gi, 'a')
+                .replace(/(sht|nt|st|nd)a\b/gi, '$1')
+                .replace(/kshya/gi, 'khya')
+                .replace(/ksha/gi, 'khya')
+                .replace(/\bjishu/gi, 'Jishu')
+                .replace(/\bishwara/gi, 'Ishwara')
+                .replace(/\bparameshwara/gi, 'Parameshwara')
+                .replace(/\bprabhu/gi, 'Prabhu')
+                .replace(/\bpabitra/gi, 'Pabitra')
+                .replace(/\bkhrisht/gi, 'Khrist')
+                .replace(/\baatma/gi, 'Aatma')
+                .replace(/\bpraarthana/gi, 'Prarthana') 
+                .replace(/\bswarga/gi, 'Swarga');
+        }
+
+        function processText() {
+            const inputField = document.getElementById('input');
+            
+            // Convert numbers globally BEFORE any other logic runs
+            const rawInput = inputField.value;
+            const input = convertOdiaNumbers(rawInput);
+            
+            const status = document.getElementById('status');
+            
+            if (!input.trim()) {
+                status.innerText = "Input is empty!";
+                return;
+            }
+
+            status.innerText = "Processing...";
+            
+            setTimeout(() => {
+                const lines = input.split('\n');
+                
+                const validTextLines = lines.filter(line => line.trim() !== '' && !line.includes('===='));
+                
+                let titleLine = null;
+                if (validTextLines.length > 0) {
+                    if (validTextLines[0].trim().startsWith('(')) {
+                        titleLine = validTextLines.length > 1 ? validTextLines[1] : null;
+                    } else {
+                        titleLine = validTextLines[0];
+                    }
+                }
+
+                if (titleLine) {
+                    // This regex now naturally works because the numbers are already English 1-9
+                    let cleanTitle = titleLine.trim().replace(/^\*+/, '').replace(/^\d+\.\s*/, '').replace(/\*+$/, '').trim();
+                    
+                    // We run convertOdiaNumbers here too just in case raw Odia numbers need to show in the Odia title box
+                    document.getElementById('odiTitle').value = convertOdiaNumbers(cleanTitle); 
+                    document.getElementById('engTitle').value = capitalizeFirstLetter(transliterateOdia(cleanTitle));
+                } else {
+                    document.getElementById('odiTitle').value = '';
+                    document.getElementById('engTitle').value = '';
+                }
+
+                const processedLines = lines.map(line => {
+                    let trimmed = line.trim();
+                    
+                    if (!trimmed || /^\d+$/.test(trimmed) || trimmed.includes('====')) {
+                        return line;
+                    }
+
+                    let transliterated = "";
+
+                    if (line.startsWith('**')) {
+                        transliterated = transliterateOdia(line.substring(2));
+                        return '**' + capitalizeFirstLetter(transliterated);
+                    }
+                    
+                    // This verse match now correctly identifies verses that started with Odia numbers!
+                    const verseMatch = line.match(/^(\d+\.)\s*(.*)/);
+                    if (verseMatch) {
+                        transliterated = transliterateOdia(verseMatch[2]);
+                        return verseMatch[1] + ' ' + capitalizeFirstLetter(transliterated);
+                    }
+
+                    if (line.trim().startsWith('(')) {
+                        return transliterateOdia(line);
+                    }
+
+                    transliterated = transliterateOdia(line);
+                    return capitalizeFirstLetter(transliterated);
+                });
+                
+                document.getElementById('output').value = processedLines.join('\n');
+                status.innerText = "Success!";
+                setTimeout(() => status.innerText = "", 3000);
+            }, 50);
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('output');
+            if (!output.value) return;
+            output.select();
+            document.execCommand('copy');
+            const status = document.getElementById('status');
+            status.innerText = "Copied to clipboard!";
+            setTimeout(() => status.innerText = "", 3000);
+        }
+
+        function copyTarget(elementId, btnElement) {
+            const el = document.getElementById(elementId);
+            if (!el.value) return;
+            el.select();
+            document.execCommand('copy');
+            
+            const originalHTML = btnElement.innerHTML;
+            btnElement.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+            
+            setTimeout(() => {
+                btnElement.innerHTML = originalHTML;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
